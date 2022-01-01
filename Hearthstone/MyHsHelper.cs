@@ -835,8 +835,9 @@ namespace MyHsHelper
                     //    Application.Quit();
                     //}
                     sleeptime += 1f;
-                    TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                    开始时间.Value = StartTime = Convert.ToInt64(ts.TotalSeconds);
+                    Resetidle();   //重置空闲时间
+                    StartTime = (DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000000;
+                    开始时间.Value = StartTime;
                     return;
                 }
 
@@ -982,14 +983,15 @@ namespace MyHsHelper
                     if (!gameState.IsGameOver())
                     {
                         sleeptime += 0.75f;
+                        //Debug.Log("StrategyRun: " + StrategyRun + "  HandleQueueOK: " + HandleQueueOK);
                         if (StrategyRun) { Resetidle(); return; } //等待策略退出
                         if (EndTurnButton.Get().m_ActorStateMgr.GetActiveStateType() == ActorStateType.ENDTURN_NO_MORE_PLAYS)   //获取回合结束按钮状态)
                         {
                             //Resetidle();   //重置空闲时间
-                            HandleQueueOK = true;
                             EntranceQueue.Clear();
                             BattleQueue.Clear();
                             InputManager.Get().DoEndTurnButton();
+                            HandleQueueOK = true;
                         }
                         else
                         {
@@ -1298,7 +1300,7 @@ namespace MyHsHelper
                 ZonePlay zonePlay = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.FRIENDLY);
                 if (phaseID == 1)
                 {
-                    if (EndTurnButton.Get().m_MyTurnText.Text.IndexOf("已登场") > -1)
+                    if (EndTurnButton.Get().m_ActorStateMgr.GetActiveStateType() == ActorStateType.ENDTURN_YOUR_TURN)
                     {
                         if (StrategyOK && EntranceQueue.Count == 0 && HandleQueueOK)         //如果加载了策略则调用策略处理登场人物
                         {
@@ -1372,7 +1374,7 @@ namespace MyHsHelper
                         {
                             Traverse.Create(InputManager.Get()).Method("HandleClickOnCardInBattlefield", new object[] { battles.Ability, true }).GetValue();
                         }
-                        if (battles .target == null)
+                        if (battles.target == null)
                         {
                             battles.Ability = null;
                         }
@@ -1809,7 +1811,7 @@ namespace MyHsHelper
             Task<bool> task = Task.Run(() =>
             {
                 HandleQueueOK = false;
-                Thread.Sleep(1200 * phaseID);
+                Thread.Sleep(2500);
                 methodInfo.Invoke(StrategyInstance, new object[] { });
                 StrategyRun = false;
                 return true;
