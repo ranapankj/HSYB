@@ -364,6 +364,7 @@ namespace MyHsHelper
             method1 = typeof(EnemyEmoteHandler).GetMethod("IsSquelched");       //屏蔽表情
             method2 = typeof(MyHsHelper).GetMethod("O");
             harmony.Patch(method1, new HarmonyMethod(method2));
+
         }
 
         public static bool OOOOO(int rewardTrackId, int level, Hearthstone.Progression.RewardTrackManager.RewardStatus status, bool forPaidTrack, List<PegasusUtil.RewardItemOutput> rewardItemOutput)      //隐藏通行证奖励
@@ -582,12 +583,14 @@ namespace MyHsHelper
             Network.Get().AckNotice(m_info.m_noticeId); //直接获取奖励
             return false;
         }
-        public static bool ____________(bool autoOpenChest, NetCache.ProfileNoticeMercenariesRewards rewardNotice, Action doneCallback = null)  //显示奖励
+        public static bool ____________(ref bool autoOpenChest, NetCache.ProfileNoticeMercenariesRewards rewardNotice, Action doneCallback = null)  //显示奖励
         {
-            if (!enableAutoPlay) { return true; }
-            //UnityEngine.Debug.Log("直接获取奖励");
-            Network.Get().AckNotice(rewardNotice.NoticeID); //直接获取奖励
-            return false;
+            //if (!enableAutoPlay) { return true; }
+            //Debug.Log("直接获取奖励autoOpenChest: " + autoOpenChest);
+            //Network.Get().AckNotice(rewardNotice.NoticeID); //直接获取奖励
+            //return false;
+            if (enableAutoPlay) { autoOpenChest = true; }
+            return true;
         }
         public static void __________(RewardBoxesDisplay.RewardBoxData boxData)    //点击5个奖励箱子
         {
@@ -835,6 +838,9 @@ namespace MyHsHelper
                     //    Application.Quit();
                     //}
                     sleeptime += 1f;
+                    HandleQueueOK = true;
+                    EntranceQueue.Clear();
+                    BattleQueue.Clear();
                     Resetidle();   //重置空闲时间
                     StartTime = (DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000000;
                     开始时间.Value = StartTime;
@@ -983,7 +989,7 @@ namespace MyHsHelper
                     if (!gameState.IsGameOver())
                     {
                         sleeptime += 0.75f;
-                        //Debug.Log("StrategyRun: " + StrategyRun + "  HandleQueueOK: " + HandleQueueOK);
+                        //Debug.Log("StrategyRun: " + StrategyRun + "  HandleQueueOK: " + HandleQueueOK + "  phaseID: " + phaseID);
                         if (StrategyRun) { Resetidle(); return; } //等待策略退出
                         if (EndTurnButton.Get().m_ActorStateMgr.GetActiveStateType() == ActorStateType.ENDTURN_NO_MORE_PLAYS)   //获取回合结束按钮状态)
                         {
@@ -1025,11 +1031,10 @@ namespace MyHsHelper
 
                                 //UnityEngine.Debug.Log("游戏结束，进入酒馆。");
                             }
-                            HandleQueueOK = true;
-                            EntranceQueue.Clear();
-                            BattleQueue.Clear();
                         }
-
+                        HandleQueueOK = true;
+                        EntranceQueue.Clear();
+                        BattleQueue.Clear();
                     }
                     return;
                 }
@@ -1372,7 +1377,17 @@ namespace MyHsHelper
                         //Debug.Log("Ability：" + battles.Ability);
                         if (battles.Ability != null)
                         {
-                            Traverse.Create(InputManager.Get()).Method("HandleClickOnCardInBattlefield", new object[] { battles.Ability, true }).GetValue();
+                            //Traverse.Create(InputManager.Get()).Method("HandleClickOnCardInBattlefield", new object[] { battles.Ability, true }).GetValue();
+                            try
+                            { 
+                            Type type = typeof(InputManager);
+                            var m = type.GetMethod("HandleClickOnCardInBattlefield", BindingFlags.NonPublic | BindingFlags.Instance);
+                            m.Invoke(InputManager.Get(), new object[] { battles.Ability, true });
+                            }
+                            catch
+                            {
+                                Debug.Log("Ability：" + battles.Ability);
+                            }
                         }
                         if (battles.target == null)
                         {
@@ -1817,9 +1832,7 @@ namespace MyHsHelper
                 return true;
             });
             bool taskResult1 = await task;  //内部自己执行了GetAwaiter() 
-
         }
-
     }
 }
 
