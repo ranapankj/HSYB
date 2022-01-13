@@ -53,10 +53,13 @@ namespace MyHsHelper
         public static BepInEx.Configuration.ConfigEntry<string> PVEteam;
         public static BepInEx.Configuration.ConfigEntry<bool> autoConcede;
         public static BepInEx.Configuration.ConfigEntry<int> Concedeline;
+        public static BepInEx.Configuration.ConfigEntry<bool> autoSwitch;
+        public static BepInEx.Configuration.ConfigEntry<int> SwitchLine;
         public static BepInEx.Configuration.ConfigEntry<int> 地图ID;
         public static BepInEx.Configuration.ConfigEntry<bool> PVE模式;      //true任务模式 false刷图模式
         public static BepInEx.Configuration.ConfigEntry<int> 步数;
-        public static BepInEx.Configuration.ConfigEntry<string> 策略;
+        public static BepInEx.Configuration.ConfigEntry<string> PVP策略;
+        public static BepInEx.Configuration.ConfigEntry<string> PVE策略;
         public static BepInEx.Configuration.ConfigEntry<long> 开始时间;
         public static BepInEx.Configuration.ConfigEntry<bool> Hidemain;
         public static BepInEx.Configuration.ConfigEntry<int> todayxp;
@@ -67,13 +70,16 @@ namespace MyHsHelper
         public static bool isPVP;
         public static bool PVEMode;
         public static int PVEstep;
-        public static string Strategy;
+        public static string StrategyPVP;
+        public static string StrategyPVE;
         public static long StartTime;
         public static bool onlyPC;
         public static string PVPteamName;
         public static string PVEteamName;
         public static int mapID;
         public static int 分数线;
+        public static bool 自动切换;
+        public static int 切换线;
         private float Labeltimer;
         //private float 投降时间;
         private static List<PegasusLettuce.LettuceMapNode> minNode = new List<PegasusLettuce.LettuceMapNode>();
@@ -167,6 +173,7 @@ namespace MyHsHelper
                     HandleQueueOK = true;
                     EntranceQueue.Clear();
                     BattleQueue.Clear();
+                    if (form != null && !form.IsDisposed) { form.button1.Text = "自动佣兵：" + (enableAutoPlay ? "开" : "关"); } 
                 }
 
                 if (GUI.Button(new Rect(92f, 1f, 90f, 29f), new GUIContent("设置")))
@@ -224,17 +231,20 @@ namespace MyHsHelper
                 tmp1.Value = 0;
             }
             Config.Clear();                             //上面这一段是清除多余的配置
-            GetVer();   //对比sha1，不对则下载
             autorun = Config.Bind("配置", "AutoRun", false, "是否自动佣兵挂机");
             enableAutoPlay = autorun.Value;
             PVP = Config.Bind("配置", "PVP", false, "PVP或者PVE");
             isPVP = PVP.Value;
-            只打电脑 = Config.Bind("配置", "onlyPC", true, "PVP只打电脑");
+            只打电脑 = Config.Bind("配置", "onlyPC", false, "PVP只打电脑");
             onlyPC = 只打电脑.Value;
-            autoConcede = Config.Bind("配置", "投降", true, "是否自动认输");
+            autoConcede = Config.Bind("配置", "投降", false, "是否自动认输");
             认输 = autoConcede.Value;
             Concedeline = Config.Bind("配置", "分数线", 6000, "自动认输分数线，高于此分数自动认输");
             分数线 = Concedeline.Value;
+            autoSwitch = Config.Bind("配置", "切换", false, "是否切换至PVE");
+            自动切换 = autoSwitch.Value;
+            SwitchLine = Config.Bind("配置", "切换线", 14000, "达到此分数时切换至PVE");
+            切换线 = SwitchLine.Value;
             PVE模式 = Config.Bind("配置", "PVE模式", true, "true任务模式 false刷图模式");
             PVEMode = PVE模式.Value;
             步数 = Config.Bind("配置", "步数", 2, "距离神秘选项怪物数，超过则重开地图。");
@@ -245,8 +255,10 @@ namespace MyHsHelper
             PVPteamName = PVPteam.Value;
             PVEteam = Config.Bind("配置", "PVEteam", "", "PVE队伍名字");
             PVEteamName = PVEteam.Value;
-            策略 = Config.Bind("配置", "策略", "", "策略文件名");
-            Strategy = 策略.Value;
+            PVP策略 = Config.Bind("配置", "PVP策略", "", "PVP策略文件名");
+            StrategyPVP = PVP策略.Value;
+            PVE策略 = Config.Bind("配置", "PVE策略", "", "PVE策略文件名");
+            StrategyPVE = PVE策略.Value;
             开始时间 = Config.Bind("配置", "开始时间", 0L, "对局开始时间");
             StartTime = 开始时间.Value;
             Hidemain = Config.Bind("配置", "隐藏", false, "是否隐藏GUI");
@@ -259,6 +271,7 @@ namespace MyHsHelper
             昨日经验 = yesterdayxp.Value;
             yesterdaytime = Config.Bind(DateTime.Now.AddDays(-1).ToString("MM-dd"), "时间", 0f, "当日挂机总时间(分钟)");
             昨日时间 = yesterdaytime.Value;
+            //GetVer();   //对比sha1，不对则下载
             GetHash();      //获取文件sha1
             LoadPolicy();
 
@@ -583,13 +596,26 @@ namespace MyHsHelper
             Network.Get().AckNotice(m_info.m_noticeId); //直接获取奖励
             return false;
         }
-        public static bool ____________(ref bool autoOpenChest, NetCache.ProfileNoticeMercenariesRewards rewardNotice, Action doneCallback = null)  //显示奖励
+        public static bool ____________(ref bool autoOpenChest,ref NetCache.ProfileNoticeMercenariesRewards rewardNotice, Action doneCallback = null)  //显示奖励
         {
             //if (!enableAutoPlay) { return true; }
             //Debug.Log("直接获取奖励autoOpenChest: " + autoOpenChest);
             //Network.Get().AckNotice(rewardNotice.NoticeID); //直接获取奖励
             //return false;
-            if (enableAutoPlay) { autoOpenChest = true; }
+            //var callerMethod = new System.Diagnostics.StackFrame(2, false)?.GetMethod();
+            //Debug.Log($"{callerMethod.DeclaringType.FullName }.{callerMethod.Name}");
+            if (!enableAutoPlay) { return true; }
+            //Debug.Log(rewardNotice.RewardType);
+            autoOpenChest = true;
+            if (rewardNotice.RewardType == ProfileNoticeMercenariesRewards.RewardType.REWARD_TYPE_PVE_CONSOLATION)
+            {
+                Network.Get().AckNotice(rewardNotice.NoticeID);
+                if (doneCallback != null)
+                {
+                    doneCallback();
+                }
+                return false;
+            }
             return true;
         }
         public static void __________(RewardBoxesDisplay.RewardBoxData boxData)    //点击5个奖励箱子
@@ -851,6 +877,15 @@ namespace MyHsHelper
                 {
                     if (isPVP)
                     {
+                        if(自动切换)
+                        {
+                            if(NetCache.Get().GetNetObject<NetCache.NetCacheMercenariesPlayerInfo>().PvpRating >= 切换线)
+                            {
+                                isPVP = PVP.Value = false;
+                                LoadPolicy();
+                                return;
+                            }
+                        }
                         //投降时间 = 0f;
                         //FindingGameTime = Time.realtimeSinceStartup;
                         List<LettuceTeam> teams = CollectionManager.Get().GetTeams();
@@ -1027,6 +1062,7 @@ namespace MyHsHelper
                                 hitbox.TriggerRelease();
                                 //AddMouse(Screen.width / 2, (float)(Screen.height / 2.5), 3);
                                 sleeptime += 4;
+                                if (isPVP) { sleeptime += 5; };
                                 Resetidle();   //重置空闲时间
 
                                 //UnityEngine.Debug.Log("游戏结束，进入酒馆。");
@@ -1090,17 +1126,17 @@ namespace MyHsHelper
         // 在插件关闭时会调用OnDestroy()方法
         void OnDestroy()
         {
-            if (!File.Exists(Assembly.GetExecutingAssembly().Location + "1")) { GetVer(); }
-            if (File.Exists(Assembly.GetExecutingAssembly().Location + "1"))
-            {
-                string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "updata.bat");
-                System.IO.StreamWriter bat = new System.IO.StreamWriter(@filename, false);
-                bat.Write(Hearthstone.Properties.Resources.updata.Replace("filename", Assembly.GetExecutingAssembly().Location));
-                bat.Close();
-                System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(filename);
-                info.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                System.Diagnostics.Process.Start(info);
-            }
+            //if (!File.Exists(Assembly.GetExecutingAssembly().Location + "1")) { GetVer(); }
+            //if (File.Exists(Assembly.GetExecutingAssembly().Location + "1"))
+            //{
+            //    string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "updata.bat");
+            //    System.IO.StreamWriter bat = new System.IO.StreamWriter(@filename, false);
+            //    bat.Write(Hearthstone.Properties.Resources.updata.Replace("filename", Assembly.GetExecutingAssembly().Location));
+            //    bat.Close();
+            //    System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(filename);
+            //    info.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            //    System.Diagnostics.Process.Start(info);
+            //}
         }
 
         //public static void MousePos(ref Vector3 __result)
@@ -1361,6 +1397,12 @@ namespace MyHsHelper
 
                 if (phaseID == 2)
                 {
+                    ZonePlay enemyPlayZone = ZoneMgr.Get().FindZoneOfType<ZonePlay>(global::Player.Side.OPPOSING);
+                    if (enemyPlayZone.GetCardCount() == 1 && enemyPlayZone.GetFirstCard().GetEntity().IsStealthed())    //如果敌方只有一个并且隐藏则直接回合结束
+                    {
+                        InputManager.Get().DoEndTurnButton();
+                        return;
+                    }
                     if (StrategyOK && BattleQueue.Count == 0 && HandleQueueOK)         //如果加载了策略则调用策略处理战斗过程
                     {
                         //Debug.Log(EndTurnButton.Get().m_MyTurnText.Text);
@@ -1758,6 +1800,13 @@ namespace MyHsHelper
 
         public static void LoadPolicy()    //载入策略
         {
+            string Strategy;
+            if (isPVP)
+            {
+                Strategy = StrategyPVP;
+            } else {
+                Strategy = StrategyPVE;
+            }
             string FileName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\" + Strategy;
             if (File.Exists(FileName))
             {

@@ -32,12 +32,18 @@ namespace Hearthstone
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBoxPVP = new System.Windows.Forms.GroupBox();
+            this.SwitchLine = new System.Windows.Forms.TextBox();
+            this.checkBoxSwitchPVE = new System.Windows.Forms.CheckBox();
+            this.comboBoxStrategyPVP = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.comboBoxTeamPVP = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.Concedeline = new System.Windows.Forms.TextBox();
+            this.ConcedeLine = new System.Windows.Forms.TextBox();
             this.checkBoxautoConcede = new System.Windows.Forms.CheckBox();
             this.checkBoxonlypc = new System.Windows.Forms.CheckBox();
             this.groupBoxPVE = new System.Windows.Forms.GroupBox();
+            this.comboBoxStrategyPVE = new System.Windows.Forms.ComboBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.comboBoxS = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.comboBoxMap = new System.Windows.Forms.ComboBox();
@@ -46,9 +52,6 @@ namespace Hearthstone
             this.label3 = new System.Windows.Forms.Label();
             this.comboBoxTeamPVE = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.comboBoxStrategy = new System.Windows.Forms.ComboBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBoxPVP.SuspendLayout();
             this.groupBoxPVE.SuspendLayout();
             this.SuspendLayout();
@@ -75,17 +78,63 @@ namespace Hearthstone
             // 
             // groupBoxPVP
             // 
+            this.groupBoxPVP.Controls.Add(this.SwitchLine);
+            this.groupBoxPVP.Controls.Add(this.checkBoxSwitchPVE);
+            this.groupBoxPVP.Controls.Add(this.comboBoxStrategyPVP);
+            this.groupBoxPVP.Controls.Add(this.label7);
             this.groupBoxPVP.Controls.Add(this.comboBoxTeamPVP);
             this.groupBoxPVP.Controls.Add(this.label1);
-            this.groupBoxPVP.Controls.Add(this.Concedeline);
+            this.groupBoxPVP.Controls.Add(this.ConcedeLine);
             this.groupBoxPVP.Controls.Add(this.checkBoxautoConcede);
             this.groupBoxPVP.Controls.Add(this.checkBoxonlypc);
             this.groupBoxPVP.Location = new System.Drawing.Point(12, 65);
             this.groupBoxPVP.Name = "groupBoxPVP";
-            this.groupBoxPVP.Size = new System.Drawing.Size(289, 176);
+            this.groupBoxPVP.Size = new System.Drawing.Size(289, 223);
             this.groupBoxPVP.TabIndex = 2;
             this.groupBoxPVP.TabStop = false;
             this.groupBoxPVP.Text = "PVP";
+            // 
+            // SwitchLine
+            // 
+            this.SwitchLine.Location = new System.Drawing.Point(222, 130);
+            this.SwitchLine.MaxLength = 5;
+            this.SwitchLine.Name = "SwitchLine";
+            this.SwitchLine.Size = new System.Drawing.Size(52, 28);
+            this.SwitchLine.TabIndex = 17;
+            this.SwitchLine.Text = "14000";
+            this.SwitchLine.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.SwitchLine.TextChanged += new System.EventHandler(this.SwitchLine_TextChanged);
+            this.SwitchLine.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SwitchLine_KeyPress);
+            // 
+            // checkBoxSwitchPVE
+            // 
+            this.checkBoxSwitchPVE.AutoSize = true;
+            this.checkBoxSwitchPVE.Location = new System.Drawing.Point(16, 132);
+            this.checkBoxSwitchPVE.Name = "checkBoxSwitchPVE";
+            this.checkBoxSwitchPVE.Size = new System.Drawing.Size(205, 22);
+            this.checkBoxSwitchPVE.TabIndex = 16;
+            this.checkBoxSwitchPVE.Text = "分数达到时切换至PVE";
+            this.checkBoxSwitchPVE.UseVisualStyleBackColor = true;
+            this.checkBoxSwitchPVE.CheckedChanged += new System.EventHandler(this.checkBoxSwitchPVE_CheckedChanged);
+            // 
+            // comboBoxStrategyPVP
+            // 
+            this.comboBoxStrategyPVP.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxStrategyPVP.DropDownWidth = 242;
+            this.comboBoxStrategyPVP.FormattingEnabled = true;
+            this.comboBoxStrategyPVP.Location = new System.Drawing.Point(110, 179);
+            this.comboBoxStrategyPVP.Name = "comboBoxStrategyPVP";
+            this.comboBoxStrategyPVP.Size = new System.Drawing.Size(164, 26);
+            this.comboBoxStrategyPVP.TabIndex = 15;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(13, 182);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(80, 18);
+            this.label7.TabIndex = 14;
+            this.label7.Text = "PVP策略:";
             // 
             // comboBoxTeamPVP
             // 
@@ -95,7 +144,6 @@ namespace Hearthstone
             this.comboBoxTeamPVP.Name = "comboBoxTeamPVP";
             this.comboBoxTeamPVP.Size = new System.Drawing.Size(142, 26);
             this.comboBoxTeamPVP.TabIndex = 0;
-            //this.comboBoxTeamPVP.SelectedIndexChanged += new System.EventHandler(this.comboBoxTeamPVP_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -106,28 +154,26 @@ namespace Hearthstone
             this.label1.TabIndex = 2;
             this.label1.Text = "选择队伍:";
             // 
-            // Concedeline
+            // ConcedeLine
             // 
-            this.Concedeline.Location = new System.Drawing.Point(222, 96);
-            this.Concedeline.MaxLength = 5;
-            this.Concedeline.Name = "Concedeline";
-            this.Concedeline.Size = new System.Drawing.Size(52, 28);
-            this.Concedeline.TabIndex = 1;
-            this.Concedeline.Text = "6000";
-            this.Concedeline.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.Concedeline.TextChanged += new System.EventHandler(this.Concedeline_TextChanged);
-            //this.Concedeline.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Concedeline_KeyPress);
+            this.ConcedeLine.Location = new System.Drawing.Point(222, 96);
+            this.ConcedeLine.MaxLength = 5;
+            this.ConcedeLine.Name = "ConcedeLine";
+            this.ConcedeLine.Size = new System.Drawing.Size(52, 28);
+            this.ConcedeLine.TabIndex = 1;
+            this.ConcedeLine.Text = "6000";
+            this.ConcedeLine.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.ConcedeLine.TextChanged += new System.EventHandler(this.Concedeline_TextChanged);
             // 
             // checkBoxautoConcede
             // 
             this.checkBoxautoConcede.AutoSize = true;
-            this.checkBoxautoConcede.Location = new System.Drawing.Point(16, 96);
+            this.checkBoxautoConcede.Location = new System.Drawing.Point(16, 98);
             this.checkBoxautoConcede.Name = "checkBoxautoConcede";
             this.checkBoxautoConcede.Size = new System.Drawing.Size(214, 22);
             this.checkBoxautoConcede.TabIndex = 0;
             this.checkBoxautoConcede.Text = "自动投降：当分数高于";
             this.checkBoxautoConcede.UseVisualStyleBackColor = true;
-            //this.checkBoxautoConcede.CheckedChanged += new System.EventHandler(this.checkBoxautoConcede_CheckedChanged);
             // 
             // checkBoxonlypc
             // 
@@ -138,10 +184,11 @@ namespace Hearthstone
             this.checkBoxonlypc.TabIndex = 0;
             this.checkBoxonlypc.Text = "只打电脑";
             this.checkBoxonlypc.UseVisualStyleBackColor = true;
-            //this.checkBoxonlypc.CheckedChanged += new System.EventHandler(this.checkBoxonlypc_CheckedChanged);
             // 
             // groupBoxPVE
             // 
+            this.groupBoxPVE.Controls.Add(this.comboBoxStrategyPVE);
+            this.groupBoxPVE.Controls.Add(this.label8);
             this.groupBoxPVE.Controls.Add(this.comboBoxS);
             this.groupBoxPVE.Controls.Add(this.label5);
             this.groupBoxPVE.Controls.Add(this.comboBoxMap);
@@ -152,10 +199,29 @@ namespace Hearthstone
             this.groupBoxPVE.Controls.Add(this.label2);
             this.groupBoxPVE.Location = new System.Drawing.Point(12, 65);
             this.groupBoxPVE.Name = "groupBoxPVE";
-            this.groupBoxPVE.Size = new System.Drawing.Size(289, 176);
+            this.groupBoxPVE.Size = new System.Drawing.Size(289, 223);
             this.groupBoxPVE.TabIndex = 3;
             this.groupBoxPVE.TabStop = false;
             this.groupBoxPVE.Text = "PVE";
+            // 
+            // comboBoxStrategyPVE
+            // 
+            this.comboBoxStrategyPVE.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxStrategyPVE.DropDownWidth = 242;
+            this.comboBoxStrategyPVE.FormattingEnabled = true;
+            this.comboBoxStrategyPVE.Location = new System.Drawing.Point(110, 179);
+            this.comboBoxStrategyPVE.Name = "comboBoxStrategyPVE";
+            this.comboBoxStrategyPVE.Size = new System.Drawing.Size(164, 26);
+            this.comboBoxStrategyPVE.TabIndex = 15;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(13, 182);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(80, 18);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "PVE策略:";
             // 
             // comboBoxS
             // 
@@ -170,7 +236,6 @@ namespace Hearthstone
             this.comboBoxS.Name = "comboBoxS";
             this.comboBoxS.Size = new System.Drawing.Size(48, 26);
             this.comboBoxS.TabIndex = 12;
-            //this.comboBoxS.SelectedIndexChanged += new System.EventHandler(this.comboBoxS_SelectedIndexChanged);
             // 
             // label5
             // 
@@ -190,7 +255,6 @@ namespace Hearthstone
             this.comboBoxMap.Name = "comboBoxMap";
             this.comboBoxMap.Size = new System.Drawing.Size(164, 26);
             this.comboBoxMap.TabIndex = 10;
-            //this.comboBoxMap.SelectedIndexChanged += new System.EventHandler(this.comboBoxMap_SelectedIndexChanged);
             // 
             // comboBoxMode
             // 
@@ -203,7 +267,6 @@ namespace Hearthstone
             this.comboBoxMode.Name = "comboBoxMode";
             this.comboBoxMode.Size = new System.Drawing.Size(164, 26);
             this.comboBoxMode.TabIndex = 9;
-            //this.comboBoxMode.SelectedIndexChanged += new System.EventHandler(this.comboBoxMode_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -231,7 +294,6 @@ namespace Hearthstone
             this.comboBoxTeamPVE.Name = "comboBoxTeamPVE";
             this.comboBoxTeamPVE.Size = new System.Drawing.Size(164, 26);
             this.comboBoxTeamPVE.TabIndex = 3;
-            //this.comboBoxTeamPVE.SelectedIndexChanged += new System.EventHandler(this.comboBoxTeamPVE_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -242,46 +304,15 @@ namespace Hearthstone
             this.label2.TabIndex = 4;
             this.label2.Text = "选择队伍:";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(25, 250);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(80, 18);
-            this.label6.TabIndex = 4;
-            this.label6.Text = "战斗策略";
-            // 
-            // comboBoxStrategy
-            // 
-            this.comboBoxStrategy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxStrategy.DropDownWidth = 242;
-            this.comboBoxStrategy.FormattingEnabled = true;
-            this.comboBoxStrategy.Location = new System.Drawing.Point(122, 247);
-            this.comboBoxStrategy.Name = "comboBoxStrategy";
-            this.comboBoxStrategy.Size = new System.Drawing.Size(164, 26);
-            this.comboBoxStrategy.TabIndex = 13;
-            //this.comboBoxStrategy.SelectedIndexChanged += new System.EventHandler(this.comboBoxStrategy_SelectedIndexChanged);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Location = new System.Drawing.Point(12, 230);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(289, 53);
-            this.groupBox1.TabIndex = 14;
-            this.groupBox1.TabStop = false;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(315, 293);
-            this.Controls.Add(this.comboBoxStrategy);
-            this.Controls.Add(this.label6);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.groupBoxPVE);
             this.Controls.Add(this.groupBoxPVP);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.groupBoxPVE);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "Form1";
@@ -292,16 +323,15 @@ namespace Hearthstone
             this.groupBoxPVE.ResumeLayout(false);
             this.groupBoxPVE.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        public  System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.GroupBox groupBoxPVP;
-        private System.Windows.Forms.TextBox Concedeline;
+        private System.Windows.Forms.TextBox ConcedeLine;
         private System.Windows.Forms.CheckBox checkBoxautoConcede;
         private System.Windows.Forms.CheckBox checkBoxonlypc;
         private System.Windows.Forms.GroupBox groupBoxPVE;
@@ -315,8 +345,11 @@ namespace Hearthstone
         private System.Windows.Forms.ComboBox comboBoxMap;
         private System.Windows.Forms.ComboBox comboBoxS;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.ComboBox comboBoxStrategy;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.ComboBox comboBoxStrategyPVP;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox comboBoxStrategyPVE;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox SwitchLine;
+        private System.Windows.Forms.CheckBox checkBoxSwitchPVE;
     }
 }
