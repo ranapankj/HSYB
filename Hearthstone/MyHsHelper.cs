@@ -1411,7 +1411,13 @@ namespace MyHsHelper
                         //Battle.Invoke(StrategyInstance, new object[] { });
                         return;
                     }
-                    //UnityEngine.Debug.Log("是否选择佣兵");
+                    if (StrategyOK && BattleQueue.Count == 0 && !HandleQueueOK)         //如果策略队列处理完毕则结束回合
+                    {
+                        InputManager.Get().DoEndTurnButton();
+                        HandleQueueOK = true;
+                        return;
+                    }
+                                                                                       //UnityEngine.Debug.Log("是否选择佣兵");
                     if (BattleQueue.Count  > 0 && battles.Ability == null)
                     {
                         //Debug.Log("BattleQueue数量：" + BattleQueue.Count);
